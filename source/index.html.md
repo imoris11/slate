@@ -2,13 +2,9 @@
 title: API Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
-  - shell
-  - ruby
-  - python
   - javascript
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
   - <a href='https://github.com/lord/slate'>Documentation Powered by Slate</a>
 
 includes:
@@ -19,221 +15,363 @@ search: true
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the SEND API! You can use our API to access our delivery endpoints which gives you the ability create and track deliveries or shipments.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+This documentation is written for shell and javascript but will work for other languages that support RESTful API consumption. 
 
-This example API documentation page was created with [Slate](https://github.com/lord/slate). Feel free to edit it and use it as a base for your own API's documentation.
 
 # Authentication
 
 > To authorize, use this code:
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
-
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
-```
-
 ```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
+fetch('api_endpoint_here', {
+  method: //HTTP Mehtod,
+  headers: {
+    'x-api-key': 'test_or_production_api_key',
+    'content-type': 'application/json'
+  }
+}).then(res => res.json()).then((result)=> {
+  //Result of API call
+}).catch((error)=> {
+  //An error occurred
+})
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+> Make sure to replace `test_or_production_api_key` with your API key.
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+The SEND API requires your API key as a header parameter. The API key should be passed under “x-api-key” for authentication purposes. 
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+SEND expects for the API key to be included in all API requests to the server in a header that looks like the following:
 
-`Authorization: meowmeowmeow`
+`x-api-key: api_key`
 
 <aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
+You must replace <code>api_key</code> with your personal API key.
 </aside>
 
-# Kittens
+Use Test API key for test requests and Production API key for production requests.
 
-## Get All Kittens
+# Requests
 
-```ruby
-require 'kittn'
+The base URL for all requests to the Postmates API is: <code>https://api.send.ng/</code>
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
+## Our Restful API:
+- uses standard HTTP verbs like GET, POST, DELETE.
+- uses standard HTTP error responses to describe errors.
+- authentication is specified with HTTP Basic Authentication.
+ POST data should be encoded as a standard <code>application/json</code>.
 
-```python
-import kittn
+##  Versioning
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
+Versioning allows us to provide developers a consistent experience. We provide two levels of versioning:
 
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
+- Resource: All endpoints are prefixed with a version such as <code>/v1</code>. This version refers to the overall layout of the endpoints and response standards.
+
+## Address Format
+
+Please format pickup and destination addresses this way:
+<code>Street Address, City, State, country, Zip</code>
+
+Any other information, like apartment number, door codes, "care of" instructions, should all be added to pick up or destination notes fields.
+
+## Responses
+All responses are in JSON.
+
+1. 200 - OK: Everything went as planned.
+2. 304 - Not Modified: Resource hasn't been updated since the date provided. See Caching below.
+3. 400 - Bad Request: Something went wrong, check below for more error messages
+4. 401 - Unauthorized: Authentication was incorrect.
+5. 404 - Not Found
+6. 429 - Too Many Requests
+7. 500 - Internal Server Error: We had a problem processing the request.
+8. 503 - Service Unavailable: Try again later.
+
+# Test Mode
+> Result
+
 
 ```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
+  //Response
   {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
+    job:{
+    origin_name: "John Doe", 
+    origin_full_address: "1 Infinite Loop, CA, USA",
+    origin_street_name: "1 Infinite Loop",
+    origin_city: "Cupertino",
+    origin_state: "CA",
+    origin_country: "USA",
+    origin_mobile: "+1302343309",
+    company_id:1,
+    origin_comment: "Check out for more information",
+    pickup_time: "2019-06-25 12:00pm",
+    pickup_day: "2019-06-25",
+    vehicle: "bike"
   },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
+  drops:[
+      {
+        dest_name: "Jane Doe", 
+        dest_full_address: "5 Infinite Loop, CA, USA",
+        dest_street_name: "5 Infinite Loop",
+        dest_city: "Cupertino",
+        dest_state: "CA",
+        dest_country: "USA",
+        dest_mobile: "+10232343454",
+        dest_comment: "Drop outside",
+        pickup_time: "2019-06-25 8:00am",
+        weight : 6
+        eta: "Estimated delivery date",
+        job_price: "Price of delivery in NGN",
+        token: "Token used for tracking delivery"
+      }],
+      status: 200 
   }
-]
+  
+```
+For your development convenience, we provide a test mode for our API. Using a test API key will allow you to exercise all the endpoints. We will automate the lifecycle of deliveries to provide a simulated experience.
+
+Here is an example of a post request body
+
+
+<code> "job": {
+"origin_name": "John Doe", 
+"origin_full_address": "1 Infinite Loop, CA, USA",
+"origin_street_name": "1 Infinite Loop",
+"origin_city": "Cupertino",
+"origin_state": "CA",
+"origin_country": "USA",
+"origin_mobile": "+1302343309",
+"company_id":1,
+"origin_comment": "Check out for more information",
+"pickup_time": "2019-06-25 12:00pm",
+"pickup_day": "2019-06-25",
+"vehicle": "bike",
+"drops_attributes": [{
+"dest_name": "Jane Doe", 
+"dest_full_address": "5 Infinite Loop, CA, USA",
+"dest_street_name": "5 Infinite Loop",
+"dest_city": "Cupertino",
+"dest_state": "CA",
+"dest_country": "USA",
+"dest_mobile": "+10232343454",
+"dest_comment": "Drop outside",
+"pickup_time": "2019-06-25 8:00am",
+"weight" : 6
+}]
+}
+</code>
+
+
+
+# Endpoints
+
+# Quotes
+
+## Get A Quote
+
+POST <code>/api/v1/quotes</code>
+
+> Create a quote
+
+```javascript
+  //Set job object
+  let job = {
+    //Origin and destination details as REQUIRED
+  }
+  fetch('/api/v1/quotes', {
+    method: 'POST',
+    body: JSON.stringify(job),
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": "test_or_production_api_key"
+    }
+  }).then(res => res.json()).then(result => {
+    if (result.status === 200) {
+      //Request successfull.
+        result = {
+          price: 'Estimated price of delivery' //float,
+          status: 200
+        }
+    }else{
+      //An error occurred due to invalid parameters
+    }
+  }).catch(e => {
+    //An unexpected error occurred (server down?)
+    console.log(e)
+  });
 ```
 
-This endpoint retrieves all kittens.
+The quotes API returns the estimated price for a shipment given the weight of the shipment, its origin, and destination. Drop types are determined by origin and destination parameters.
 
-### HTTP Request
+**Query Parameters**
 
-`GET http://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
+Name | Data Type | Description
 --------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+drop_type | string | “intl”, “nationwide”, or “lastmile”
+weight REQUIRED | float | The weight of the shipment
+dest_country REQUIRED | string | Drop off country, if drop_type is “intl”
+origin_country REQUIRED | string | Pickup country, if drop_type is “intl”
+dest_state REQUIRED | string | Drop off state, if drop_type is “nationwide”
+dest_city REQUIRED | string | Drop off city, if drop_type is “nationwide” or“lastmile”
+origin_state REQUIRED | string | Pickup state, if drop_type is “nationwide”
+origin_city REQUIRED | string | Pickup city, if drop_type is “nationwide”
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
+# Deliveries
 
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
+## Create a delivery
+> Create a delivery
 
 ```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
+  //Set job object
+  let job = {
+    //Job details as shown in test mode section
+  }
+  fetch('/api/v1/deliveries', {
+    method: 'POST',
+    body: JSON.stringify(job),
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": "test_or_production_api_key"
+    }
+  }).then(res => res.json())
+  .then(result => {
+    if (result.status === 200) {
+      //Request successfull.
+      //See response as shown in test mode section
+    }else{
+      //An error occurred due to invalid parameters
+    }
+  }).catch(e => {
+    //An unexpected error occurred (server down?)
+    console.log(e)
+  });
 ```
 
-> The above command returns JSON structured like this:
+POST:  <code>/api/v1/deliveries/</code>
 
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
+**Query Paramters**
 
-This endpoint retrieves a specific kitten.
+Name | Data Type | Description
+--------- | ------- | -----------
+dest_full_address REQUIRED | string | The dropoff address for a potential delivery.
+origin_address_address REQUIRED | string | The pickup address for a potential delivery.
+dest_lat | float | Latitude of dropoff location will be used instead of geocoding address if passed 
+dest_long | float | Longitude of dropoff location, will be used instead of geocoding address if passed.
+dest_mobile | string | Phone number of the dropoff location. If passed, the phone number will be validated.
+origin_lat | float | Latitude of origin location, will be used instead of geocoding address if passed
+origin_longitude | float  | Longitude of the pickup location will be used instead of geocoding address if passed.
+pickup_day REQUIRED | timestamp (RFC 3339) | Date/Time (YYYY-MM-DD HH:MM: SS ) for when a delivery is ready to be picked up.
+origin_mobile | string | Phone number of the pickup location. If passed, the phone number will be validated.
+pickup_time REQUIRED | timestamp (RFC 3339) | Date/Time for when an order will be ready for pickup
+Weight REQUIRED | float | Weight of items to be picked up and delivered.
+dest_country REQUIRED | string | Destination country.
+dest_city REQUIRED | string | City items will be delivered to.
+dest_state REQUIRED | string | State items will be delivered to.
+origin_country REQUIRED | string | Origin country.
+origin_city REQUIRED | string | City items will be picked up from.
+origin_state REQUIRED | string State items will be picked up from.
+origin_name REQUIRED | string | Name of sender 
+dest_name REQUIRED | string | Name of receiver
+origin_comment | string | Extra comments for pickup information
+dest_comment | string | Comment for delivery. Delivery instructions
+vehicle | string | Type of vehicle necessary for pickup and delivery.
 
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
-
-## Delete a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
-```
+## Get All Deliveries
 
 ```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
+fetch('/api/v1/deliveries', {
+    headers: {
+      "x-api-key": "test_or_production_api_key"
+    }
+  }).then(res => res.json())
+  .then(result => {
+      console.log(result)// List of drops
+  }).catch(e => {
+    //An unexpected error occurred (server down?)
+    console.log(e)
+  });
 ```
+List all deliveries for a customer.
 
-> The above command returns JSON structured like this:
+**Query Parameters**
 
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
+<code>completed</code>  => true if to filter by completed
+
+<code>page</code> => page of items to show (used for pagination)
+
+
+## Get A Delivery
+
+```javascript
+fetch('/api/v1/deliveries/{drop-token}', {
+    headers: {
+      "x-api-key": "test_or_production_api_key"
+    }
+  }).then(res => res.json())
+  .then(result => {
+     console.log(result) //Drop object containing updated details of a drop
+  }).catch(e => {
+    //An unexpected error occurred (server down?)
+    console.log(e)
+  });
 ```
+GET:  <code>/api/v1/deliveries/{drop_token}</code>
 
-This endpoint deletes a specific kitten.
 
-### HTTP Request
+Get updated details about a shipment
 
-`DELETE http://example.com/kittens/<ID>`
+**Query Parameters**
+<code>drop-token</code> => Unique identifier for a shipment
 
-### URL Parameters
+## Cancel A Delivery
 
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
+```javascript
+fetch(' /api/v1/deliveries/{drop_token}/cancel', {
+    method: 'DELETE',
+    headers: {
+      "x-api-key": "test_or_production_api_key"
+    }
+  }).then(res => res.json())
+  .then(result => {
+    if (result.status === 200){
+      console.log(result.notice) //Status of delivery
+    }
+  }).catch(e => {
+    //An unexpected error occurred (server down?)
+    console.log(e)
+  });
+```
+DELETE:  <code> /api/v1/deliveries/{drop_token}/cancel</code>
 
+
+Cancel an ongoing delivery. Delivery can only be canceled prior to a courier completing pickup. Delivery fees still apply.
+
+**Query Parameters**
+
+<code>drop-token</code> => Unique identifier for a shipment
+
+## Track A Delivery
+
+```javascript
+fetch(' /api/v1/deliveries/{drop_token}/track', {
+    headers: {
+      "x-api-key": "test_or_production_api_key"
+    }
+  }).then(res => res.json())
+  .then(result => {
+    if (result.status === 200){
+      console.log(result) //Tracking details
+    }
+  }).catch(e => {
+    //An unexpected error occurred (server down?)
+    console.log(e)
+  });
+```
+GET:  <code> /api/v1/deliveries/{drop_token}/track</code>
+
+
+Get tracking details of a delivery.
+
+**Query Parameters**
+
+<code>drop-token</code> => Unique identifier for a shipment
