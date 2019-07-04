@@ -201,7 +201,7 @@
       <script src="javascripts/all.js"></script>
   </head>
 
-  <body class="index" data-languages="[&quot;javascript&quot;]">
+  <body class="index" data-languages="[&quot;shell&quot;,&quot;javascript&quot;]">
     <a href="#" id="nav-button">
       <span>
         Menu
@@ -211,6 +211,7 @@
     <div class="toc-wrapper">
       <img src="images/logo.svg" class="logo" alt="Logo" />
         <div class="lang-selector">
+              <a href="#" data-language-name="shell">shell</a>
               <a href="#" data-language-name="javascript">javascript</a>
         </div>
         <div class="search">
@@ -294,11 +295,16 @@
 <blockquote>
 <p>To authorize, use this code:</p>
 </blockquote>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">fetch</span><span class="p">(</span><span class="s1">'api_endpoint_here'</span><span class="p">,</span> <span class="p">{</span>
-  <span class="na">method</span><span class="p">:</span> <span class="c1">//HTTP Mehtod,</span>
+<pre class="highlight shell tab-shell"><code>
+  curl <span class="s1">'api_endpoint_here'</span> 
+  -H <span class="s1">'x-api-key: test_or_production_key'</span> 
+  -H <span class="s1">'Content-Type: application/json'</span>
+  -X GET <span class="c">#POST/PUT/DELETE</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="nx">fetch</span><span class="p">(</span><span class="s1">'api_endpoint_here'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">method</span><span class="p">:</span> <span class="nx">GET</span><span class="p">,</span><span class="c1">//POST/PUT/DELETE,</span>
   <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
     <span class="s1">'x-api-key'</span><span class="p">:</span> <span class="s1">'test_or_production_api_key'</span><span class="p">,</span>
-    <span class="s1">'content-type'</span><span class="p">:</span> <span class="s1">'application/json'</span>
+    <span class="s1">'Content-Type'</span><span class="p">:</span> <span class="s1">'application/json'</span>
   <span class="p">}</span>
 <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">()).</span><span class="nx">then</span><span class="p">((</span><span class="nx">result</span><span class="p">)</span><span class="o">=&gt;</span> <span class="p">{</span>
   <span class="c1">//Result of API call</span>
@@ -356,9 +362,45 @@ POST data should be encoded as a standard <code>application/json</code>.</li>
 </ol>
 <h1 id='test-mode'>Test Mode</h1>
 <blockquote>
-<p>Result</p>
+<p>Expected Response Object</p>
 </blockquote>
-<pre class="highlight javascript tab-javascript"><code>  <span class="c1">//Response</span>
+<pre class="highlight shell tab-shell"><code>
+ <span class="c">#Response</span>
+  <span class="o">{</span>
+    job:<span class="o">{</span>
+    origin_name: <span class="s2">"John Doe"</span>, 
+    origin_full_address: <span class="s2">"1 Infinite Loop, CA, USA"</span>,
+    origin_street_name: <span class="s2">"1 Infinite Loop"</span>,
+    origin_city: <span class="s2">"Cupertino"</span>,
+    origin_state: <span class="s2">"CA"</span>,
+    origin_country: <span class="s2">"USA"</span>,
+    origin_mobile: <span class="s2">"+1302343309"</span>,
+    company_id:1,
+    origin_comment: <span class="s2">"Check out for more information"</span>,
+    pickup_time: <span class="s2">"2019-06-25 12:00pm"</span>,
+    pickup_day: <span class="s2">"2019-06-25"</span>,
+    vehicle: <span class="s2">"bike"</span>
+  <span class="o">}</span>,
+  drops:[
+      <span class="o">{</span>
+        dest_name: <span class="s2">"Jane Doe"</span>, 
+        dest_full_address: <span class="s2">"5 Infinite Loop, CA, USA"</span>,
+        dest_street_name: <span class="s2">"5 Infinite Loop"</span>,
+        dest_city: <span class="s2">"Cupertino"</span>,
+        dest_state: <span class="s2">"CA"</span>,
+        dest_country: <span class="s2">"USA"</span>,
+        dest_mobile: <span class="s2">"+10232343454"</span>,
+        dest_comment: <span class="s2">"Drop outside"</span>,
+        pickup_time: <span class="s2">"2019-06-25 8:00am"</span>,
+        weight : 6
+        eta: <span class="s2">"Estimated delivery date"</span>,
+        job_price: <span class="s2">"Price of delivery in NGN"</span>,
+        token: <span class="s2">"Token used for tracking delivery"</span>
+      <span class="o">}]</span>,
+      status: 200 
+  <span class="o">}</span>
+
+</code></pre><pre class="highlight javascript tab-javascript"><code>  <span class="c1">//Response</span>
   <span class="p">{</span>
     <span class="nl">job</span><span class="p">:{</span>
     <span class="nl">origin_name</span><span class="p">:</span> <span class="s2">"John Doe"</span><span class="p">,</span> 
@@ -431,7 +473,18 @@ POST data should be encoded as a standard <code>application/json</code>.</li>
 <blockquote>
 <p>Create a quote</p>
 </blockquote>
-<pre class="highlight javascript tab-javascript"><code>  <span class="c1">//Set job object</span>
+<pre class="highlight shell tab-shell"><code>curl <span class="s1">'/api/v1/quotes'</span>
+-H <span class="s1">'Content-Type: application/json'</span>
+-H <span class="s1">'x-api-key: test_or_production_api_key'</span>
+-d <span class="s1">'@data.json'</span> <span class="c">#job object in a json file</span>
+-X POST
+
+<span class="c">#Successful request</span>
+<span class="o">{</span>
+  price: <span class="s1">'Estimated price of delivery'</span> <span class="c">#float</span>
+  status: 200
+<span class="o">}</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code>  <span class="c1">//Set job object</span>
   <span class="kd">let</span> <span class="nx">job</span> <span class="o">=</span> <span class="p">{</span>
     <span class="c1">//Origin and destination details as REQUIRED</span>
   <span class="p">}</span>
@@ -439,7 +492,7 @@ POST data should be encoded as a standard <code>application/json</code>.</li>
     <span class="na">method</span><span class="p">:</span> <span class="s1">'POST'</span><span class="p">,</span>
     <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">job</span><span class="p">),</span>
     <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
-      <span class="s2">"content-type"</span><span class="p">:</span> <span class="s2">"application/json"</span><span class="p">,</span>
+      <span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/json"</span><span class="p">,</span>
       <span class="s2">"x-api-key"</span><span class="p">:</span> <span class="s2">"test_or_production_api_key"</span>
     <span class="p">}</span>
   <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">()).</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -513,7 +566,15 @@ POST data should be encoded as a standard <code>application/json</code>.</li>
 <blockquote>
 <p>Create a delivery</p>
 </blockquote>
-<pre class="highlight javascript tab-javascript"><code>  <span class="c1">//Set job object</span>
+<pre class="highlight shell tab-shell"><code>curl <span class="s1">'/api/v1/deliveries'</span>
+-H <span class="s1">'Content-Type: application/json'</span>
+-H <span class="s1">'x-api-key: test_or_production_api_key'</span>
+-d <span class="s1">'@data.json'</span> <span class="c">#job object in a json file</span>
+-X POST
+
+<span class="c">#See response as shown in test mode section</span>
+
+</code></pre><pre class="highlight javascript tab-javascript"><code>  <span class="c1">//Set job object</span>
   <span class="kd">let</span> <span class="nx">job</span> <span class="o">=</span> <span class="p">{</span>
     <span class="c1">//Job details as shown in test mode section</span>
   <span class="p">}</span>
@@ -521,7 +582,7 @@ POST data should be encoded as a standard <code>application/json</code>.</li>
     <span class="na">method</span><span class="p">:</span> <span class="s1">'POST'</span><span class="p">,</span>
     <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">job</span><span class="p">),</span>
     <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
-      <span class="s2">"content-type"</span><span class="p">:</span> <span class="s2">"application/json"</span><span class="p">,</span>
+      <span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/json"</span><span class="p">,</span>
       <span class="s2">"x-api-key"</span><span class="p">:</span> <span class="s2">"test_or_production_api_key"</span>
     <span class="p">}</span>
   <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
@@ -659,13 +720,21 @@ POST data should be encoded as a standard <code>application/json</code>.</li>
 <td>Type of vehicle necessary for pickup and delivery.</td>
 </tr>
 </tbody></table>
-<h2 id='get-all-deliveries'>Get All Deliveries</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">fetch</span><span class="p">(</span><span class="s1">'/api/v1/deliveries'</span><span class="p">,</span> <span class="p">{</span>
+<h2 id='get-all-deliveries'>Get All Deliveries</h2><pre class="highlight shell tab-shell"><code>curl <span class="s1">'/api/v1/deliveries'</span>
+-H <span class="s1">'Content-Type: application/json'</span>
+-H <span class="s1">'x-api-key: test_or_production_api_key'</span>
+-X GET
+
+<span class="c">#Result is a list of drops depending on specified filter</span>
+
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="nx">fetch</span><span class="p">(</span><span class="s1">'/api/v1/deliveries'</span><span class="p">,</span> <span class="p">{</span>
     <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
       <span class="s2">"x-api-key"</span><span class="p">:</span> <span class="s2">"test_or_production_api_key"</span>
+      <span class="s2">"Content_Type"</span><span class="p">:</span> <span class="s2">"application/json"</span>
     <span class="p">}</span>
   <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span><span class="c1">// List of drops</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span><span class="c1">// List of drops depending on specified filter</span>
   <span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="c1">//An unexpected error occurred (server down?)</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span>
@@ -675,10 +744,18 @@ POST data should be encoded as a standard <code>application/json</code>.</li>
 
 <p><strong>Query Parameters</strong></p>
 
-<p><code>completed</code>  =&gt; true if to filter by completed</p>
+<p><code>completed</code>  =&gt; true if to filter by completed
+<code>current</code>  =&gt; true if to filter by current</p>
 
 <p><code>page</code> =&gt; page of items to show (used for pagination)</p>
-<h2 id='get-a-delivery'>Get A Delivery</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">fetch</span><span class="p">(</span><span class="s1">'/api/v1/deliveries/{drop-token}'</span><span class="p">,</span> <span class="p">{</span>
+<h2 id='get-a-delivery'>Get A Delivery</h2><pre class="highlight shell tab-shell"><code>curl <span class="s1">'/api/v1/deliveries/{drop-token}'</span>
+-H <span class="s1">'Content-Type: application/json'</span>
+-H <span class="s1">'x-api-key: test_or_production_api_key'</span>
+-X GET
+
+<span class="c">#Result is a drop object containing updated details of a drop</span>
+
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="nx">fetch</span><span class="p">(</span><span class="s1">'/api/v1/deliveries/{drop-token}'</span><span class="p">,</span> <span class="p">{</span>
     <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
       <span class="s2">"x-api-key"</span><span class="p">:</span> <span class="s2">"test_or_production_api_key"</span>
     <span class="p">}</span>
@@ -696,15 +773,27 @@ POST data should be encoded as a standard <code>application/json</code>.</li>
 
 <p><strong>Query Parameters</strong>
 <code>drop-token</code> =&gt; Unique identifier for a shipment</p>
-<h2 id='cancel-a-delivery'>Cancel A Delivery</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">fetch</span><span class="p">(</span><span class="s1">' /api/v1/deliveries/{drop_token}/cancel'</span><span class="p">,</span> <span class="p">{</span>
+<h2 id='cancel-a-delivery'>Cancel A Delivery</h2><pre class="highlight shell tab-shell"><code>curl <span class="s1">'/api/v1/deliveries/{drop-token}/cancel'</span>
+-H <span class="s1">'Content-Type: application/json'</span>
+-H <span class="s1">'x-api-key: test_or_production_api_key'</span>
+-X DELETE
+
+<span class="c">#Result</span>
+<span class="o">{</span>
+  message: <span class="s2">"Status of delivery"</span> <span class="c">#string,</span>
+  status: 200 <span class="c">#Status code</span>
+<span class="o">}</span>
+
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="nx">fetch</span><span class="p">(</span><span class="s1">' /api/v1/deliveries/{drop_token}/cancel'</span><span class="p">,</span> <span class="p">{</span>
     <span class="na">method</span><span class="p">:</span> <span class="s1">'DELETE'</span><span class="p">,</span>
     <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
-      <span class="s2">"x-api-key"</span><span class="p">:</span> <span class="s2">"test_or_production_api_key"</span>
+      <span class="s2">"x-api-key"</span><span class="p">:</span> <span class="s2">"test_or_production_api_key"</span><span class="p">,</span>
+      <span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/json"</span>
     <span class="p">}</span>
   <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">){</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">notice</span><span class="p">)</span> <span class="c1">//Status of delivery</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">message</span><span class="p">)</span> <span class="c1">//Status of delivery</span>
     <span class="p">}</span>
   <span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="c1">//An unexpected error occurred (server down?)</span>
@@ -718,9 +807,20 @@ POST data should be encoded as a standard <code>application/json</code>.</li>
 <p><strong>Query Parameters</strong></p>
 
 <p><code>drop-token</code> =&gt; Unique identifier for a shipment</p>
-<h2 id='track-a-delivery'>Track A Delivery</h2><pre class="highlight javascript tab-javascript"><code><span class="nx">fetch</span><span class="p">(</span><span class="s1">' /api/v1/deliveries/{drop_token}/track'</span><span class="p">,</span> <span class="p">{</span>
+<h2 id='track-a-delivery'>Track A Delivery</h2><pre class="highlight shell tab-shell"><code>curl <span class="s1">'/api/v1/deliveries/{drop-token}/track'</span>
+-H <span class="s1">'Content-Type: application/json'</span>
+-H <span class="s1">'x-api-key: test_or_production_api_key'</span>
+-X GET
+
+<span class="c">#Result</span>
+<span class="o">{</span>
+  <span class="c">#Tracking details of a delivery</span>
+<span class="o">}</span>
+
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="nx">fetch</span><span class="p">(</span><span class="s1">'/api/v1/deliveries/{drop_token}/track'</span><span class="p">,</span> <span class="p">{</span>
     <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
-      <span class="s2">"x-api-key"</span><span class="p">:</span> <span class="s2">"test_or_production_api_key"</span>
+      <span class="s1">'x-api-key": "test_or_production_api_key'</span><span class="p">,</span>
+      <span class="s1">'Content-Type: application/json'</span>
     <span class="p">}</span>
   <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -803,6 +903,7 @@ POST data should be encoded as a standard <code>application/json</code>.</li>
       </div>
       <div class="dark-box">
           <div class="lang-selector">
+                <a href="#" data-language-name="shell">shell</a>
                 <a href="#" data-language-name="javascript">javascript</a>
           </div>
       </div>
