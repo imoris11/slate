@@ -2,6 +2,7 @@
 title: API Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
+  - shell
   - javascript
 
 toc_footers:
@@ -24,12 +25,20 @@ This documentation is written for shell and javascript but will work for other l
 
 > To authorize, use this code:
 
+```shell
+
+  curl 'api_endpoint_here' 
+  -H 'x-api-key: test_or_production_key' 
+  -H 'Content-Type: application/json'
+  -X GET #POST/PUT/DELETE
+```
+
 ```javascript
 fetch('api_endpoint_here', {
-  method: //HTTP Mehtod,
+  method: GET,//POST/PUT/DELETE,
   headers: {
     'x-api-key': 'test_or_production_api_key',
-    'content-type': 'application/json'
+    'Content-Type': 'application/json'
   }
 }).then(res => res.json()).then((result)=> {
   //Result of API call
@@ -88,8 +97,47 @@ All responses are in JSON.
 8. 503 - Service Unavailable: Try again later.
 
 # Test Mode
-> Result
+> Expected Response Object
 
+
+```shell
+
+ #Response
+  {
+    job:{
+    origin_name: "John Doe", 
+    origin_full_address: "1 Infinite Loop, CA, USA",
+    origin_street_name: "1 Infinite Loop",
+    origin_city: "Cupertino",
+    origin_state: "CA",
+    origin_country: "USA",
+    origin_mobile: "+1302343309",
+    company_id:1,
+    origin_comment: "Check out for more information",
+    pickup_time: "2019-06-25 12:00pm",
+    pickup_day: "2019-06-25",
+    vehicle: "bike"
+  },
+  drops:[
+      {
+        dest_name: "Jane Doe", 
+        dest_full_address: "5 Infinite Loop, CA, USA",
+        dest_street_name: "5 Infinite Loop",
+        dest_city: "Cupertino",
+        dest_state: "CA",
+        dest_country: "USA",
+        dest_mobile: "+10232343454",
+        dest_comment: "Drop outside",
+        pickup_time: "2019-06-25 8:00am",
+        weight : 6
+        eta: "Estimated delivery date",
+        job_price: "Price of delivery in NGN",
+        token: "Token used for tracking delivery"
+      }],
+      status: 200 
+  }
+
+```
 
 ```javascript
   //Response
@@ -173,6 +221,20 @@ POST <code>/api/v1/quotes</code>
 
 > Create a quote
 
+```shell
+curl '/api/v1/quotes'
+-H 'Content-Type: application/json'
+-H 'x-api-key: test_or_production_api_key'
+-d '@data.json' #job object in a json file
+-X POST
+
+#Successful request
+{
+  price: 'Estimated price of delivery' #float
+  status: 200
+}
+```
+
 ```javascript
   //Set job object
   let job = {
@@ -182,7 +244,7 @@ POST <code>/api/v1/quotes</code>
     method: 'POST',
     body: JSON.stringify(job),
     headers: {
-      "content-type": "application/json",
+      "Content-Type": "application/json",
       "x-api-key": "test_or_production_api_key"
     }
   }).then(res => res.json()).then(result => {
@@ -221,6 +283,17 @@ origin_city REQUIRED | string | Pickup city, if drop_type is “nationwide”
 ## Create a delivery
 > Create a delivery
 
+```shell
+curl '/api/v1/deliveries'
+-H 'Content-Type: application/json'
+-H 'x-api-key: test_or_production_api_key'
+-d '@data.json' #job object in a json file
+-X POST
+
+#See response as shown in test mode section
+
+```
+
 ```javascript
   //Set job object
   let job = {
@@ -230,7 +303,7 @@ origin_city REQUIRED | string | Pickup city, if drop_type is “nationwide”
     method: 'POST',
     body: JSON.stringify(job),
     headers: {
-      "content-type": "application/json",
+      "Content-Type": "application/json",
       "x-api-key": "test_or_production_api_key"
     }
   }).then(res => res.json())
@@ -278,14 +351,25 @@ vehicle | string | Type of vehicle necessary for pickup and delivery.
 
 ## Get All Deliveries
 
+```shell
+curl '/api/v1/deliveries'
+-H 'Content-Type: application/json'
+-H 'x-api-key: test_or_production_api_key'
+-X GET
+
+#Result is a list of drops depending on specified filter
+
+```
+
 ```javascript
 fetch('/api/v1/deliveries', {
     headers: {
       "x-api-key": "test_or_production_api_key"
+      "Content_Type": "application/json"
     }
   }).then(res => res.json())
   .then(result => {
-      console.log(result)// List of drops
+      console.log(result)// List of drops depending on specified filter
   }).catch(e => {
     //An unexpected error occurred (server down?)
     console.log(e)
@@ -296,11 +380,22 @@ List all deliveries for a customer.
 **Query Parameters**
 
 <code>completed</code>  => true if to filter by completed
+<code>current</code>  => true if to filter by current
 
 <code>page</code> => page of items to show (used for pagination)
 
 
 ## Get A Delivery
+
+```shell
+curl '/api/v1/deliveries/{drop-token}'
+-H 'Content-Type: application/json'
+-H 'x-api-key: test_or_production_api_key'
+-X GET
+
+#Result is a drop object containing updated details of a drop
+
+```
 
 ```javascript
 fetch('/api/v1/deliveries/{drop-token}', {
@@ -325,16 +420,31 @@ Get updated details about a shipment
 
 ## Cancel A Delivery
 
+```shell
+curl '/api/v1/deliveries/{drop-token}/cancel'
+-H 'Content-Type: application/json'
+-H 'x-api-key: test_or_production_api_key'
+-X DELETE
+
+#Result
+{
+  message: "Status of delivery" #string,
+  status: 200 #Status code
+}
+
+```
+
 ```javascript
 fetch(' /api/v1/deliveries/{drop_token}/cancel', {
     method: 'DELETE',
     headers: {
-      "x-api-key": "test_or_production_api_key"
+      "x-api-key": "test_or_production_api_key",
+      "Content-Type": "application/json"
     }
   }).then(res => res.json())
   .then(result => {
     if (result.status === 200){
-      console.log(result.notice) //Status of delivery
+      console.log(result.message) //Status of delivery
     }
   }).catch(e => {
     //An unexpected error occurred (server down?)
@@ -352,10 +462,24 @@ Cancel an ongoing delivery. Delivery can only be canceled prior to a courier com
 
 ## Track A Delivery
 
+```shell
+curl '/api/v1/deliveries/{drop-token}/track'
+-H 'Content-Type: application/json'
+-H 'x-api-key: test_or_production_api_key'
+-X GET
+
+#Result
+{
+  #Tracking details of a delivery
+}
+
+```
+
 ```javascript
-fetch(' /api/v1/deliveries/{drop_token}/track', {
+fetch('/api/v1/deliveries/{drop_token}/track', {
     headers: {
-      "x-api-key": "test_or_production_api_key"
+      'x-api-key": "test_or_production_api_key',
+      'Content-Type: application/json'
     }
   }).then(res => res.json())
   .then(result => {
